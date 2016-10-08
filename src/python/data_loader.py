@@ -5,11 +5,12 @@ import mechanize
 from bs4 import BeautifulSoup
 
 DATA_URLS = (
-    'ajax_sections',
-    'ajax_rooms',
-    'ajax_resourcetypes',
-    'ajax_times',
-    'ajax_teachers',
+    'sections',
+    'rooms',
+    'resource_types',
+    'timeslots',
+    'actually_teachers',
+    'ajax_schedule_assignments_csv',
 )
 
 def main():
@@ -38,6 +39,10 @@ def main():
 
 def login(host, username, password, form_name):
     br = mechanize.Browser()
+    br.set_handle_referer(True)
+    br.set_handle_robots(False)
+    br.set_handle_refresh(True)
+    br.set_handle_redirect(True)
     br.open('https://%s/set_csrf_token' % host)
     br.open('https://%s/' % host)
     if form_name is None:
@@ -68,8 +73,9 @@ def load_data(host, username, password, program_string, target_dir, form_name):
     (browser, cookie_jar) = login(host, username, password, form_name)
 
     for data_url in DATA_URLS:
-        url = 'https://%s/manage/%s/%s' % (
+        url = 'https://%s/%s/%s/%s' % (
             host,
+            'manage' if data_url.startswith('ajax') else 'json',
             program_string,
             data_url,
             )

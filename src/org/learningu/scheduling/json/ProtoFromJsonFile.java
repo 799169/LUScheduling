@@ -110,22 +110,22 @@ public final class ProtoFromJsonFile {
   }
 
   public JsonArray getTeachers() throws JsonSyntaxException, IOException {
-    return new JsonParser().parse(Files.toString(teachersFile, Charsets.UTF_8)).getAsJsonArray();
+    return new JsonParser().parse(Files.toString(teachersFile, Charsets.UTF_8)).getAsJsonObject().get("teachers").getAsJsonArray();
   }
 
   public JsonArray getPeriods() throws JsonSyntaxException, IOException {
-    return new JsonParser().parse(Files.toString(periodsFile, Charsets.UTF_8)).getAsJsonArray();
+    return new JsonParser().parse(Files.toString(periodsFile, Charsets.UTF_8)).getAsJsonObject().get("timeslots").getAsJsonArray();
   }
 
   public JsonArray getRooms() throws JsonSyntaxException, IOException {
-    return new JsonParser().parse(Files.toString(roomsFile, Charsets.UTF_8)).getAsJsonArray();
+    return new JsonParser().parse(Files.toString(roomsFile, Charsets.UTF_8)).getAsJsonObject().get("rooms").getAsJsonArray();
   }
 
   public JsonArray getSections() throws JsonSyntaxException, IOException {
-    return new JsonParser().parse(Files.toString(sectionsFile, Charsets.UTF_8)).getAsJsonArray();
+    return new JsonParser().parse(Files.toString(sectionsFile, Charsets.UTF_8)).getAsJsonObject().get("sections").getAsJsonArray();
   }
 
   public JsonArray getResources() throws JsonSyntaxException, IOException {
-    return new JsonParser().parse(Files.toString(resourcesFile, Charsets.UTF_8)).getAsJsonArray();
+    return new JsonParser().parse(Files.toString(resourcesFile, Charsets.UTF_8)).getAsJsonObject().get("resource_types").getAsJsonArray();
   }
 }

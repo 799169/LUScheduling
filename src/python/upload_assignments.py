@@ -18,6 +18,7 @@ def main():
     parser.add_option("-p", "--password", dest="password")
     parser.add_option("-r", "--program", dest="program")
     parser.add_option("-s", "--source-csv", dest="source_csv")
+    parser.add_option("-t", "--old-csv", dest="old_csv")
     parser.add_option("-f", "--loginform-name", dest="form_name", default=None)
 
     (options, args) = parser.parse_args()
@@ -29,9 +30,9 @@ def main():
     if options.list_programs:
         list_programs(options.host, options.username, options.password, options.form_name)
     else:
-        upload_assignments(options.host, options.username, options.password, options.program, options.source_csv, options.form_name)
+        upload_assignments(options.host, options.username, options.password, options.program, options.source_csv, options.old_csv, options.form_name)
 
-def upload_assignments(host, username, password, program_string, source_csv, form_name):
+def upload_assignments(host, username, password, program_string, source_csv, old_csv, form_name):
     (browser, cookie_jar) = login(host, username, password, form_name)
 
     url = 'https://%s/manage/%s/%s' % (
@@ -44,12 +45,20 @@ def upload_assignments(host, username, password, program_string, source_csv, for
         print "You told me to stop."
         return
 
+    old_sections = set([])
+    with open(old_csv, 'r') as old_file:
+        reader = csv.reader(old_file)
+        for row in reader:
+            section_id, r, p = row
+            old_sections.add(section_id)
+
     section_assignments = collections.defaultdict(list)
     with open(source_csv, 'r') as source_file:
         reader = csv.reader(source_file)
         for row in reader:
             section_id, room_id, period_id = row
-            section_assignments[section_id].append((period_id, room_id))
+            if not section_id in old_sections:
+                section_assignments[section_id].append((period_id, room_id))
 
     if raw_input("About to schedule %s sections. Are you really sure? (type yes) " % len(section_assignments)).lower() != 'yes':
         print "You told me to stop."

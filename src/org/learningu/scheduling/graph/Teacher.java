@@ -4,7 +4,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -30,9 +32,16 @@ public final class Teacher extends ProgramObject<SerialTeacher> {
 
   // Does not cache!
   Set<ClassPeriod> getCompatiblePeriods() {
-    return ImmutableSet.copyOf(Lists.transform(
-        serial.getAvailablePeriodList(),
-        Functions.forMap(program.periods)));
+    return ImmutableSet.copyOf(Iterables.transform(
+          Iterables.filter(
+            serial.getAvailablePeriodList(),
+            new Predicate<Integer>() {
+              public boolean apply(Integer i) {
+                return program.periods.get(i) != null;
+              }
+            }
+            ),
+          Functions.forMap(program.periods)));
   }
 
   public String getName() {

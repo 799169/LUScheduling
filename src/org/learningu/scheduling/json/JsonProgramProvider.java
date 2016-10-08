@@ -83,7 +83,7 @@ public class JsonProgramProvider implements Provider<SerialProgram> {
   public SerialPeriod parsePeriod(JsonObject obj) {
     SerialPeriod.Builder builder = SerialPeriod.newBuilder();
     builder.setPeriodId(obj.get("id").getAsInt());
-    builder.setDescription(obj.get("description").getAsString());
+    builder.setDescription(obj.get("label").getAsString());
     builder.setShortDescription(obj.get("short_description").getAsString());
     mergeBase(builder, builder.getPeriodId(), basePeriods);
     return builder.build();
@@ -137,23 +137,26 @@ public class JsonProgramProvider implements Provider<SerialProgram> {
     }
     builder.setSubjectId(subjId);
 
-    JsonArray gradeArray = obj.get("grades").getAsJsonArray();
-    builder.setMinGrade(gradeArray.get(0).getAsInt());
-    builder.setMaxGrade(gradeArray.get(1).getAsInt());
+    builder.setMinGrade(obj.get("grade_min").getAsInt());
+    builder.setMaxGrade(obj.get("grade_max").getAsInt());
 
     builder.setCourseTitle(obj.get("emailcode").getAsString() + ": "
-        + obj.get("text").getAsString());
+        + obj.get("title").getAsString());
     int size = obj.get("class_size_max").getAsInt();
     builder.setEstimatedClassSize(size).setMaxClassSize(size);
     for (JsonElement t : obj.get("teachers").getAsJsonArray()) {
       builder.addTeacherId(t.getAsInt());
     }
-    builder.setCourseId(obj.get("class_id").getAsInt());
+    builder.setCourseId(obj.get("parent_class").getAsInt());
     builder.setPeriodLength(DoubleMath.roundToInt(
         obj.get("length").getAsDouble(),
         RoundingMode.HALF_EVEN));
 
-    JsonArray resourceArray = obj.get("resource_requests").getAsJsonArray();
+    JsonObject resourceObject = obj.get("resource_requests").getAsJsonObject();
+    String idString = Integer.toString(obj.get("id").getAsInt());
+    JsonArray resourceArray = resourceObject.has(idString)
+      ? resourceObject.get(idString).getAsJsonArray()
+      : new JsonArray();
     for (int i = 0; i < resourceArray.size(); i++) {
       JsonArray res = resourceArray.get(i).getAsJsonArray();
       int resId = res.get(0).getAsInt();
